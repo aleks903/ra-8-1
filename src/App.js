@@ -7,61 +7,18 @@ import Details from './component/Details.js';
 
 export default function App() {
   const url = process.env.REACT_APP_URL
-  const [list, setList] = useState([]);
-  const [details, setDetails] = useState({});
-  const [currentFetch, setCurrentFetch] = useState({
-    state: setList,
-    itemUrl: `${url}users.json`,
-  });
-  const [isLoading, setLoading] = useState(false);
-
-  useEffect(() => {
-    console.log('effect');
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(currentFetch.itemUrl);
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        const data = await response.json();
-        currentFetch.state(data);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-
-    };
-    fetchData();
-  }, [currentFetch]);
+  const [currentId, setCurrentId] = useState();
 
   const handleClick = (id) => {
-    if(id !== details.id) {
-      setList(prevList => prevList.map((item) => {
-        let activeItem = false;
-        if (item.id === id) {
-          activeItem = true;
-        }
-        return {
-          id: item.id,
-          name: item.name,
-          active: activeItem,
-        };
-      }))
-
-      setCurrentFetch({
-        state: setDetails,
-        itemUrl: `${url}${id}.json`,
-      });
+    if (currentId !== id) {
+      setCurrentId(id);
     }
   }
 
   return (
     <React.Fragment>
-      {isLoading && <p className="loading">Loading...</p>}
-      <List data={list} onClickItem={handleClick} />
-      {details.id && <Details data={details} />}
+      <List url={url} onClickItem={handleClick} />
+      {currentId && <Details url={url} dataId={currentId}/>}
     </React.Fragment>
   );
 }

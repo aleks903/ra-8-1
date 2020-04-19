@@ -1,15 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Details(props) {
-  const { data } = props;
-  console.log('renders');
+  const {url, dataId } = props;
+  const [details, setDetails] = useState();
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${url}${dataId}.json`);
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        const data = await response.json();
+        // console.log(data)
+        setDetails(data);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [dataId]);
+
   return (
-    <div id={data.id} className="details">
-      <img src={data.avatar} />
-      <p className="name">{data.name}</p>
-      <p>City: {data.details.city}</p>
-      <p>Company: {data.details.company}</p>
-      <p>Position: {data.details.position}</p>
-    </div>
+    <React.Fragment>
+      {isLoading && <p className="loading">Loading...</p>}
+      {details && <div id={details.id} className="details">
+        <img src={details.avatar} />
+        <p className="name">{details.name}</p>
+        <p>City: {details.details.city}</p>
+        <p>Company: {details.details.company}</p>
+        <p>Position: {details.details.position}</p>
+      </div>
+      }
+    </React.Fragment>
   );
 }
